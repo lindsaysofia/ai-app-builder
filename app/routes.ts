@@ -5,4 +5,5 @@ export default [
   route("build", "routes/build.tsx"),
   route("app/:appId", "routes/app.$appId.tsx"),
   route("api/apps", "routes/api.apps.ts"),
+  route("api/generate", "routes/api.generate.ts"),
 ] satisfies RouteConfig;
