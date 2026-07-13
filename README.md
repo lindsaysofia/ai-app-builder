@@ -4,6 +4,8 @@ A platform where educators can describe an AI assistant in plain English and get
 
 Inspired by [Playlab.ai](https://www.playlab.ai/), built as a focused mini version that covers the core creation flow: describe, configure, preview, and share.
 
+**Live demo:** [ai-app-builder-production-fd7c.up.railway.app](https://ai-app-builder-production-fd7c.up.railway.app)
+
 ## How It Works
 
 An educator types a natural language description like *"Build me a friendly mental health app that helps high school students work through overwhelming feelings."* The system calls Claude to decompose that description into a structured configuration with four fields:
@@ -14,6 +16,11 @@ An educator types a natural language description like *"Build me a friendly ment
 - **Reference Material** — optional curriculum or content the AI should draw from
 
 The educator can review and edit each field, then save to get a shareable link. Anyone with the link can chat with the configured assistant immediately.
+
+![Builder - describe your app](docs/images/describe.png)
+![Builder - configure the prompt](docs/images/configure.png)
+![Builder - share](docs/images/share.png)
+![Chat player](docs/images/chat.png)
 
 ## Architecture
 
