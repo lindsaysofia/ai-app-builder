@@ -159,7 +159,7 @@ curl -X POST http://localhost:5173/api/apps \
 ```
 It should return an id. Verify you can access http://localhost:5173/app/THAT_ID
 
-### Phase 1: The Builder Flow
+### Phase 2: The Builder Flow
 Install the Anthropic SDK
 ```
 npm install @anthropic-ai/sdk
@@ -168,8 +168,11 @@ Add your Anthropic API key to .env
 ```
 ANTHROPIC_API_KEY="your-key-here"
 ```
-Create app/routes/api.generate.ts
+Create app/routes/api.generate.ts and update app.routes.ts to include it
 Update app/routes/build.tsx to show two different stages: First, a description form. Then, editable prompt fields
 
 Navigate to /build and verify you are able to generate a prompt, and create a shareable link
 
+### Phase 3: Create Live Conversations with the Configured AI Assistant
+
+Create app/routes/api.chat.ts and update app.routes.ts to include it
