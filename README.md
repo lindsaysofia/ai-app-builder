@@ -17,6 +17,11 @@ An educator types a natural language description like *"Build me a friendly ment
 
 The educator can review and edit each field, then save to get a shareable link. Anyone with the link can chat with the configured assistant immediately.
 
+![Builder - describe your app](docs/images/describe.png)
+![Builder - configure the prompt](docs/images/configure.png)
+![Builder - share](docs/images/share.png)
+![Chat player](docs/images/chat.png)
+
 ## Architecture
 
 Single Remix (React Router v7) application in TypeScript. The framework handles both the frontend UI and the backend API routes in one deployable unit.
