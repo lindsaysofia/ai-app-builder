@@ -160,13 +160,15 @@ const styles: Record<string, React.CSSProperties> = {
   page: {
     display: "flex",
     flexDirection: "column",
-    height: "100vh",
+    height: "100dvh", // dvh instead of vh — handles mobile browser chrome
     background: "#f8f8fa",
+    overflow: "hidden",
   },
   header: {
     padding: "16px 24px",
     borderBottom: "1px solid #e5e7eb",
     background: "#ffffff",
+    flexShrink: 0,
   },
   appName: {
     fontSize: 18,
@@ -177,7 +179,7 @@ const styles: Record<string, React.CSSProperties> = {
   chatArea: {
     flex: 1,
     overflowY: "auto" as const,
-    padding: "24px",
+    padding: "24px 16px",
     display: "flex",
     flexDirection: "column",
     gap: 16,
@@ -190,6 +192,7 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     textAlign: "center" as const,
     color: "#6b7280",
+    padding: "0 24px",
   },
   emptyTitle: {
     fontSize: 16,
@@ -202,7 +205,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#6b7280",
   },
   messageBubble: {
-    maxWidth: "75%",
+    maxWidth: "85%",
     padding: "12px 16px",
     borderRadius: 12,
     fontSize: 14,
@@ -238,20 +241,23 @@ const styles: Record<string, React.CSSProperties> = {
     animation: "pulse 1s infinite",
   },
   inputArea: {
-    padding: "16px 24px",
+    padding: "12px 16px",
     borderTop: "1px solid #e5e7eb",
     background: "#ffffff",
+    flexShrink: 0,
   },
   inputRow: {
     display: "flex",
-    gap: 12,
+    gap: 8,
     maxWidth: 640,
     margin: "0 auto",
+    alignItems: "flex-end",
   },
   textInput: {
     flex: 1,
+    minWidth: 0, // prevents flex item from overflowing
     padding: "10px 14px",
-    fontSize: 14,
+    fontSize: 16, // 16px prevents iOS zoom on focus
     fontFamily: "Inter, -apple-system, sans-serif",
     border: "1px solid #e5e7eb",
     borderRadius: 8,
@@ -260,7 +266,7 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.5,
   },
   sendBtn: {
-    padding: "10px 20px",
+    padding: "10px 16px",
     fontSize: 14,
     fontWeight: 600,
     background: "#6c47ff",
@@ -269,5 +275,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     cursor: "pointer",
     fontFamily: "Inter, -apple-system, sans-serif",
+    flexShrink: 0, // prevents button from getting squished
   },
 };
