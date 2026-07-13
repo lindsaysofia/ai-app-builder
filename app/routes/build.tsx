@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
 export default function Build() {
-  const navigate = useNavigate();
-
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
   const [background, setBackground] = useState("");
@@ -11,15 +8,26 @@ export default function Build() {
   const [guardrails, setGuardrails] = useState("");
   const [referenceMaterial, setReferenceMaterial] = useState("");
 
-  const [step, setStep] = useState<"describe" | "edit">("describe");
+  const [step, setStep] = useState<"describe" | "generating" | "edit">("describe");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    background: true,
+    workflow: false,
+    guardrails: false,
+    referenceMaterial: false,
+  });
+
+  function toggleSection(key: string) {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   async function handleGenerate() {
-    setLoading(true);
+    setStep("generating");
     setError("");
+
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -32,11 +40,20 @@ export default function Build() {
       setBackground(data.background);
       setWorkflow(data.workflow);
       setGuardrails(data.guardrails);
-      setStep("edit");
+
+      // Brief pause so the user sees the transition
+      setTimeout(() => {
+        setStep("edit");
+        setOpenSections({
+          background: true,
+          workflow: false,
+          guardrails: false,
+          referenceMaterial: false,
+        });
+      }, 600);
     } catch {
       setError("Something went wrong generating your app. Please try again.");
-    } finally {
-      setLoading(false);
+      setStep("describe");
     }
   }
 
@@ -83,7 +100,9 @@ export default function Build() {
     setReferenceMaterial("");
   }
 
+  // Share URL screen
   if (shareUrl) {
+    const appId = shareUrl.split("/app/")[1];
     return (
       <div className="container">
         <div className="card success-card">
@@ -100,7 +119,7 @@ export default function Build() {
           </div>
           <div className="btn-row" style={{ justifyContent: "center" }}>
             <button
-              onClick={() => navigate(`/app/${shareUrl.split("/app/")[1]}`)}
+              onClick={() => window.open(`/app/${appId}`, "_blank")}
               className="btn btn-primary"
             >
               Preview App
@@ -114,6 +133,24 @@ export default function Build() {
     );
   }
 
+  // Generating screen
+  if (step === "generating") {
+    return (
+      <div className="container">
+        <div className="card" style={{ textAlign: "center", padding: "60px 24px" }}>
+          <div style={spinnerStyle} />
+          <h2 style={{ fontSize: 18, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>
+            Building your app...
+          </h2>
+          <p style={{ fontSize: 14, color: "var(--color-text-secondary)" }}>
+            Generating background, workflow, and guardrails from your description.
+          </p>
+        </div>
+        <style>{spinnerKeyframes}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <h1 className="page-title">
@@ -122,7 +159,7 @@ export default function Build() {
       <p className="page-subtitle">
         {step === "describe"
           ? "Describe the AI app you want to build. Mention the subject, grade level, and what kind of support it should provide."
-          : "Review and edit the generated configuration. These fields control how your AI assistant will behave."}
+          : "Review and edit each section below. Click a section to expand or collapse it."}
       </p>
 
       {error && <div className="error-msg">{error}</div>}
@@ -141,92 +178,82 @@ export default function Build() {
           </div>
           <button
             onClick={handleGenerate}
-            disabled={loading || !description.trim()}
+            disabled={!description.trim()}
             className="btn btn-primary"
             style={{ width: "100%" }}
           >
-            {loading ? "Generating..." : "Generate App"}
+            Generate App
           </button>
         </div>
       )}
 
       {step === "edit" && (
-        <div className="card">
-          <div className="field-group">
-            <label className="field-label">App Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input"
-            />
+        <div>
+          {/* App Name - always visible */}
+          <div className="card" style={{ marginBottom: 12 }}>
+            <div className="field-group" style={{ marginBottom: 0 }}>
+              <label className="field-label">App Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="input"
+              />
+            </div>
           </div>
 
-          <div className="field-group">
-            <label className="field-label">Background</label>
-            <p className="field-hint">
-              Who is this AI assistant? Define its role, personality, and expertise.
+          {/* Original description - shown for reference */}
+          <div
+            className="card"
+            style={{
+              marginBottom: 12,
+              background: "var(--color-bg)",
+              border: "1px dashed var(--color-border)",
+            }}
+          >
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
+              <strong>Your prompt:</strong> {description}
             </p>
-            <textarea
-              value={background}
-              onChange={(e) => setBackground(e.target.value)}
-              rows={5}
-              className="input"
-            />
           </div>
 
-          <div className="field-group">
-            <label className="field-label">Workflow</label>
-            <p className="field-hint">
-              How should a conversation go, step by step?
-            </p>
-            <textarea
-              value={workflow}
-              onChange={(e) => setWorkflow(e.target.value)}
-              rows={5}
-              className="input"
-            />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label">Guardrails</label>
-            <p className="field-hint">
-              What boundaries must this assistant maintain?
-            </p>
-            <textarea
-              value={guardrails}
-              onChange={(e) => setGuardrails(e.target.value)}
-              rows={5}
-              className="input"
-            />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label">Reference Material</label>
-            <span
-              style={{
-                fontSize: 12,
-                color: "var(--color-text-secondary)",
-                fontWeight: 400,
-                marginLeft: 6,
-              }}
-            >
-              Optional
-            </span>
-            <p className="field-hint">
-              Paste any curriculum, rubrics, or content the AI should reference.
-            </p>
-            <textarea
-              value={referenceMaterial}
-              onChange={(e) => setReferenceMaterial(e.target.value)}
-              rows={4}
-              className="input"
-            />
-          </div>
+          {/* Collapsible sections */}
+          <CollapsibleSection
+            title="Background"
+            hint="Who is this AI assistant? Its role, personality, and expertise."
+            value={background}
+            onChange={setBackground}
+            isOpen={openSections.background}
+            onToggle={() => toggleSection("background")}
+          />
+          <CollapsibleSection
+            title="Workflow"
+            hint="How should a conversation go, step by step?"
+            value={workflow}
+            onChange={setWorkflow}
+            isOpen={openSections.workflow}
+            onToggle={() => toggleSection("workflow")}
+          />
+          <CollapsibleSection
+            title="Guardrails"
+            hint="What boundaries must this assistant maintain?"
+            value={guardrails}
+            onChange={setGuardrails}
+            isOpen={openSections.guardrails}
+            onToggle={() => toggleSection("guardrails")}
+          />
+          <CollapsibleSection
+            title="Reference Material"
+            hint="Paste any curriculum, rubrics, or content the AI should reference."
+            value={referenceMaterial}
+            onChange={setReferenceMaterial}
+            isOpen={openSections.referenceMaterial}
+            onToggle={() => toggleSection("referenceMaterial")}
+            optional
+          />
 
           <div className="btn-row">
             <button onClick={() => setStep("describe")} className="btn btn-secondary">
-              Back
+              Start Over
             </button>
             <button
               onClick={handleSave}
@@ -242,3 +269,111 @@ export default function Build() {
     </div>
   );
 }
+
+function CollapsibleSection({
+  title,
+  hint,
+  value,
+  onChange,
+  isOpen,
+  onToggle,
+  optional,
+}: {
+  title: string;
+  hint: string;
+  value: string;
+  onChange: (v: string) => void;
+  isOpen: boolean;
+  onToggle: () => void;
+  optional?: boolean;
+}) {
+  return (
+    <div className="card" style={{ marginBottom: 12 }}>
+      <button
+        onClick={onToggle}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
+          fontFamily: "var(--font-sans)",
+        }}
+      >
+        <div style={{ textAlign: "left" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text)" }}>
+            {title}
+          </span>
+          {optional && (
+            <span
+              style={{
+                fontSize: 12,
+                color: "var(--color-text-secondary)",
+                fontWeight: 400,
+                marginLeft: 6,
+              }}
+            >
+              Optional
+            </span>
+          )}
+          {!isOpen && value && (
+            <p
+              style={{
+                fontSize: 13,
+                color: "var(--color-text-secondary)",
+                marginTop: 4,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: 480,
+              }}
+            >
+              {value}
+            </p>
+          )}
+        </div>
+        <span
+          style={{
+            fontSize: 18,
+            color: "var(--color-text-secondary)",
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
+        >
+          ▾
+        </span>
+      </button>
+
+      {isOpen && (
+        <div style={{ marginTop: 12 }}>
+          <p className="field-hint">{hint}</p>
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            rows={6}
+            className="input"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+const spinnerKeyframes = `
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const spinnerStyle: React.CSSProperties = {
+  width: 36,
+  height: 36,
+  border: "3px solid var(--color-border)",
+  borderTopColor: "var(--color-primary)",
+  borderRadius: "50%",
+  animation: "spin 0.8s linear infinite",
+  margin: "0 auto",
+};

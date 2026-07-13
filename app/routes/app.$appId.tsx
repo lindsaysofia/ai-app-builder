@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLoaderData } from "react-router";
 import { prisma } from "~/lib/db.server";
 import type { Route } from "./+types/app.$appId";
+import ReactMarkdown from "react-markdown";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const app = await prisma.app.findUnique({
@@ -107,7 +108,9 @@ export default function AppPlayer() {
             <div style={styles.messageRole}>
               {msg.role === "user" ? "You" : app.name}
             </div>
-            <div style={styles.messageContent}>{msg.content}</div>
+            <div className="markdown-content" style={styles.messageContent}>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
           </div>
         ))}
 
