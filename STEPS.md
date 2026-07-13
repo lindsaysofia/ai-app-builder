@@ -6,7 +6,7 @@ npx create-react-router@latest ai-app-builder // using instead of npx remix@next
 
 Create a PostgreSQL instance in Railway (we are using Railway since we'll need to run a Node server and host a PostgreSQL database and Railway does both)
 1. Create an account in Railway
-2. Create a new PostgresSQL instance, it'll be empty for now
+2. Create a new PostgresSQL instance. It'll be empty for now
 
 Set up a query layer with Prisma (Prisma gives us type safety, migrations, and it's commonly used with Remix/TypeScript)
 1. Install Prisma
@@ -159,4 +159,17 @@ curl -X POST http://localhost:5173/api/apps \
 ```
 It should return an id. Verify you can access http://localhost:5173/app/THAT_ID
 
+### Phase 1: The Builder Flow
+Install the Anthropic SDK
+```
+npm install @anthropic-ai/sdk
+```
+Add your Anthropic API key to .env
+```
+ANTHROPIC_API_KEY="your-key-here"
+```
+Create app/routes/api.generate.ts
+Update app/routes/build.tsx to show two different stages: First, a description form. Then, editable prompt fields
+
+Navigate to /build and verify you are able to generate a prompt, and create a shareable link
 
