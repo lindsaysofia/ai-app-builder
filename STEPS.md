@@ -14,3 +14,26 @@ Set up a query layer with Prisma (Prisma gives us type safety, migrations, and i
 npm install prisma @prisma/client
 npx prisma init
 ```
+Update your .env file to include the following
+```
+DATABASE_URL="your DATABASE_PUBLIC_URL from Railway"
+```
+
+Add the following to your prisma/schema.prisma file
+```
+model App {
+  id                String   @id @default(cuid())
+  name              String
+  description       String
+  background        String
+  workflow          String
+  guardrails        String
+  referenceMaterial String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+```
+Run the following - no need to have Remix running
+```
+npx prisma migrate dev --name init
+```

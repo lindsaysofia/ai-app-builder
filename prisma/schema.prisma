@@ -11,3 +11,15 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model App {
+  id                String   @id @default(cuid())
+  name              String
+  description       String
+  background        String
+  workflow          String
+  guardrails        String
+  referenceMaterial String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
